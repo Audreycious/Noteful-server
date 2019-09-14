@@ -7,6 +7,7 @@ const { NODE_ENV } = require('./config')
 const bodyParser = express.json()
 let uuid = require('uuid')
 const FoldersService = require('./folders/folders-service')
+const NotesService = require('./notes/notes-service')
 
 const foldersRouter = require('./folders/folders-router')
 const notesRouter = require('./notes/notes-router')
@@ -52,11 +53,9 @@ app.post("/api/add-folder", bodyParser, (req, res, next) => {
             id: id,
             name: name
         }
-        // console.log(newFolder)
         
         FoldersService.addFolder(knexInstance, newFolder)
             .then(response => {
-                // console.log(response)
                 return response})
             .then(folder => {
                 return res.status(200).json(folder)
@@ -64,13 +63,34 @@ app.post("/api/add-folder", bodyParser, (req, res, next) => {
         
        
 })
-
-
-// app.get('/notes', (req, res) => {
-//     res.json(notes)
-// })
-
-
+app.post("/api/add-note", bodyParser, (req, res, next) => {
+    let knexInstance = req.app.get('db')
+    let { name, modified, folderid, content } = req.body
+    
+    if (!name) {
+        logger.error(`Name is required`)
+        return res
+            .status(400)
+            .json({
+                error: { message: `Name is required` }
+            })
+    }
+    const id = uuid();
+    let newNote = {
+        id: id,
+        name: name,
+        modified: modified,
+        folderid: folderid,
+        content: content
+    }
+    
+    NotesService.addNote(knexInstance, newNote)
+        .then(response => {
+            return response})
+        .then(folder => {
+            return res.status(200).json(folder)
+        })      
+})
 
 app.use(function errorHandler(error, req, res, next) {
     let response

@@ -3,13 +3,11 @@ const FoldersService = {
         return knex.select('*').from('folders')
     },
     addFolder(knex, newFolder) {
-        console.log(newFolder)
         return knex
             .insert(newFolder)
             .into('folders')
             .returning('*')
             .then(rows => {
-                console.log(rows)
                 return rows[0]
             })
     },
