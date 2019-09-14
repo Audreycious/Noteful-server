@@ -3,6 +3,7 @@ const logger = require('../logger')
 const foldersRouter = express.Router()
 const bodyParser = express.json()
 const FoldersService = require('./folders-service')
+let uuid = require('uuid')
 
 foldersRouter
     .route('/')
@@ -16,8 +17,5 @@ foldersRouter
                 res.json(folders)
             })    
     })
-    // .post((req, res, next) => {
-
-    // })
-
+    
 module.exports = foldersRouter
