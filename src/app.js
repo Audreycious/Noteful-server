@@ -65,7 +65,7 @@ app.post("/api/add-folder", bodyParser, (req, res, next) => {
 })
 app.post("/api/add-note", bodyParser, (req, res, next) => {
     let knexInstance = req.app.get('db')
-    let { name, modified, folderid, content } = req.body
+    let { name, modified, folder_id, content } = req.body
     
     if (!name) {
         logger.error(`Name is required`)
@@ -80,7 +80,7 @@ app.post("/api/add-note", bodyParser, (req, res, next) => {
         id: id,
         name: name,
         modified: modified,
-        folderid: folderid,
+        folderid: folder_id,
         content: content
     }
     
