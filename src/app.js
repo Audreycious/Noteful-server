@@ -5,16 +5,13 @@ const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const bodyParser = express.json()
-let uuid = require('uuid')
+const uuid = require('uuid')
 const FoldersService = require('./folders/folders-service')
 const NotesService = require('./notes/notes-service')
-
 const foldersRouter = require('./folders/folders-router')
 const notesRouter = require('./notes/notes-router')
-// const addFolderRouter = require('./add-folder/add-folder-router')
 
 const app = express()
-
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -59,9 +56,7 @@ app.post("/api/add-folder", bodyParser, (req, res, next) => {
                 return response})
             .then(folder => {
                 return res.status(200).json(folder)
-            })   
-        
-       
+            })           
 })
 app.post("/api/add-note", bodyParser, (req, res, next) => {
     let knexInstance = req.app.get('db')
@@ -80,16 +75,25 @@ app.post("/api/add-note", bodyParser, (req, res, next) => {
         id: id,
         name: name,
         modified: modified,
-        folderid: folder_id,
+        folder_id: folder_id,
         content: content
     }
-    
     NotesService.addNote(knexInstance, newNote)
         .then(response => {
-            return response})
+            return response
+        })
         .then(folder => {
             return res.status(200).json(folder)
         })      
+})
+app.delete('/api/notes/:noteId', (req, res, next) => {
+    let knexInstance = req.app.get('db')
+    let noteId = req.params.noteId
+    NotesService.deleteNote(knexInstance, noteId)
+        .then(() => {
+            res.status(200).json(noteId)
+        })
+        .catch(next)
 })
 
 app.use(function errorHandler(error, req, res, next) {
@@ -97,7 +101,6 @@ app.use(function errorHandler(error, req, res, next) {
     if (NODE_ENV === 'production') {
         response = { error: { message: 'server error' } }
     } else {
-        console.error(error)
         res = { message: error.message, error }
     }
     res.status(500).json(res)
